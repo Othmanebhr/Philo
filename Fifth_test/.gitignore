@@ -1,0 +1,4 @@
+philo
+.vscode
+*.Identifier
+*.o

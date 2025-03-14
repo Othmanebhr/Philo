@@ -1,0 +1,51 @@
+Ne pas oublier d'ajouter une verif lorsque tous les philos ont mangés. (potentiel thread supp)
+static void	*philo_routine(void *arg)
+
+Malloc struct +forks (rules)
+
+
+
+
+
+{
+	t_philo	*philo;
+
+	philo = (t_philo *) arg;
+	if (philo->index % 2 == 0)
+		usleep(15000); //15 ms usleep prends des microseconde
+	while(!philo->rules->stop)
+	{
+		pthread_mutex_lock(philo->left_fork);
+		print_act(philo->rules, philo->index, "has taken a fork");
+		pthread_mutex_lock(&philo->self_mutex);
+		print_act(philo->rules, philo->index, "has taken a fork");
+
+		pthread_mutex_lock(&philo->rules->writing);
+		if(!philo->rules->stop)
+		{
+			printf("%lld	philosopher %d is eating.\n",
+				current_time_in_ms() - philo->rules->start_time, philo->index);
+			philo->last_meal = current_time_in_ms();
+			philo->meal_count++;
+		}
+		pthread_mutex_unlock(&philo->rules->writing);
+		usleep(philo->rules->tt_eat * 1000);
+		
+		pthread_mutex_unlock(philo->left_fork);//ajouter une virgule au besoin
+		pthread_mutex_unlock(&philo->self_mutex);
+
+		pthread_mutex_lock(&philo->rules->writing);
+		if(!philo->rules->stop)
+			printf("%lld	philosopher %d is sleeping\n",
+				current_time_in_ms() - philo->rules->start_time, philo->index);
+		pthread_mutex_unlock(&philo->rules->writing);
+		usleep(philo->rules->tt_sleep * 1000);
+
+		pthread_mutex_lock(&philo->rules->writing);
+		if (!philo->rules->stop)
+			printf("%lld	philosopher %d is thinking\n",
+			current_time_in_ms() - philo->rules->start_time, philo->index);
+		pthread_mutex_unlock(&philo->rules->writing);
+	}
+	return (NULL);
+}
